@@ -95,7 +95,7 @@ class ProductManager{
 
     deleteProduct(idProd){
         try{
-            const products = this.getProducts();
+            let products = this.getProducts();
             products = products.filter(prod => prod.id !== idProd);
             fs.writeFileSync(this.#path,JSON.stringify(products),'utf-8');
             console.log("Producto eliminado con éxito!")
@@ -105,8 +105,10 @@ class ProductManager{
     }
 }
 
-const manager = new ProductManager();
+const manager = new ProductManager('productos.json');
 manager.addProduct('titulo','titulo prueba',50,'sin imagen','abc123',25);
 console.log(manager.getProductById(1));
-manager.addProduct('titulo','titulo prueba',50,'sin imagen','abc123',25);
-console.log(manager.getProductById(5));
+manager.addProduct('titulo','titulo prueba',50,'sin imagen','def123',25);
+console.log(manager.getProducts());
+manager.updateProduct(1,{title:'cambio de titulo'});
+manager.deleteProduct(2);
