@@ -1,13 +1,25 @@
+const fs = require('fs');
+
+
 class ProductManager{
     static #ultimoId = 1;
     #products
+    #path
 
-    constructor(){
+    constructor(path){
         this.#products = [];
+        this.#path = path
     }
 
     getProducts(){
-        return this.#products;
+        try{
+            const fileContent = fs.readFileSync(this.#path, 'utf-8');
+            const products = JSON.parse(fileContent);
+            return products;
+        }catch(error){
+            console.error("Error al leer el archivo: ",error);
+            return []
+        }
     }
 
     #getNuevoId(){
@@ -40,15 +52,55 @@ class ProductManager{
         }
 
         this.#products.push(product);
+        this.saveProductsToFile();
+    }
+
+    saveProductsToFile(){
+        const productsJSON = JSON.stringify(this.#products);
+
+        fs.writeFileSync(this.#path,productsJSON,'utf-8')
     }
 
     getProductById(idProd){
-        const productToFind = this.#products.find(prod=>prod.id === idProd);
-        if (!productToFind){
-            console.error("Not Found")
-            return null
-        }else{
-            return(productToFind)
+        try{
+            const products = this.getProducts();
+            const productToFind = products.find(prod=>prod.id === idProd);
+            if (!productToFind){
+                console.error("Not Found")
+                return null
+            }else{
+                return(productToFind)
+            }
+        }catch(error){
+            console.error("Error al leer el archivo: ", error);
+            return null;
+        }
+    }
+
+    updateProduct(idProd,updateFields){
+        try{
+            const products = this.getProducts();
+            const index = products.findIndex(prod => prod.id === idProd);
+            if(index !== -1){
+                products[index] = {...products[index], ...updateFields};
+                fs.writeFileSync(this.#path,JSON.stringify(products),'utf-8');
+                console.log("Producto actualizado con éxito!")
+            }else{
+                console.log("Producto no encontrado");
+            }
+        }catch(error){
+            console.error("Error al actualizar el producto: ",error);
+        }
+    }
+
+    deleteProduct(idProd){
+        try{
+            const products = this.getProducts();
+            products = products.filter(prod => prod.id !== idProd);
+            fs.writeFileSync(this.#path,JSON.stringify(products),'utf-8');
+            console.log("Producto eliminado con éxito!")
+        }catch(error){
+            console.error("Error al eliminar el producto: ",error);
         }
     }
 }
