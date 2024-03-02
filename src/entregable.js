@@ -1,20 +1,23 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 
 
 class ProductManager{
     static #ultimoId = 1;
-    #products
     #path
 
     constructor(path){
-        this.#products = [];
         this.#path = path
     }
 
-    getProducts(){
+    async getProducts(limit){
         try{
-            const fileContent = fs.readFileSync(this.#path, 'utf-8');
+            const fileContent = await fs.readFile(this.#path, 'utf-8');
             const products = JSON.parse(fileContent);
+
+            if(limit!==undefined){
+                products=products.slice(0,limit);
+            }
+
             return products;
         }catch(error){
             console.error("Error al leer el archivo: ",error);
@@ -28,14 +31,15 @@ class ProductManager{
         return id
     }
 
-    addProduct(title,description,price,thumbnail,code,stock){
+    async addProduct(title,description,price,thumbnail,code,stock){
 
         if (!title || !description || !price || !thumbnail || !code || !stock) {
             console.error("Todos los campos son obligatorios");
             return
         }
 
-        const existingCode = this.#products.some(prod => prod.code === code);
+        const products = await this.getProducts();
+        const existingCode = products.some(prod => prod.code === code);
         if (existingCode){
             console.error("Este codigo ya existe");
             return
@@ -51,19 +55,19 @@ class ProductManager{
             stock,
         }
 
-        this.#products.push(product);
-        this.saveProductsToFile();
+        products.push(product);
+        await this.saveProductsToFile();
     }
 
-    saveProductsToFile(){
-        const productsJSON = JSON.stringify(this.#products);
+    async saveProductsToFile(){
+        const productsJSON = JSON.stringify(products);
 
-        fs.writeFileSync(this.#path,productsJSON,'utf-8')
+        await fs.writeFile(this.#path,productsJSON,'utf-8')
     }
 
-    getProductById(idProd){
+    async getProductById(idProd){
         try{
-            const products = this.getProducts();
+            const products = await this.getProducts();
             const productToFind = products.find(prod=>prod.id === idProd);
             if (!productToFind){
                 console.error("Not Found")
@@ -77,13 +81,13 @@ class ProductManager{
         }
     }
 
-    updateProduct(idProd,updateFields){
+    async updateProduct(idProd,updateFields){
         try{
-            const products = this.getProducts();
+            const products = await this.getProducts();
             const index = products.findIndex(prod => prod.id === idProd);
             if(index !== -1){
                 products[index] = {...products[index], ...updateFields};
-                fs.writeFileSync(this.#path,JSON.stringify(products),'utf-8');
+                await this.saveProductsToFile(products);
                 console.log("Producto actualizado con éxito!")
             }else{
                 console.log("Producto no encontrado");
@@ -93,11 +97,11 @@ class ProductManager{
         }
     }
 
-    deleteProduct(idProd){
+    async deleteProduct(idProd){
         try{
-            let products = this.getProducts();
+            let products = await this.getProducts();
             products = products.filter(prod => prod.id !== idProd);
-            fs.writeFileSync(this.#path,JSON.stringify(products),'utf-8');
+            await this.saveProductsToFile(products);
             console.log("Producto eliminado con éxito!")
         }catch(error){
             console.error("Error al eliminar el producto: ",error);
@@ -105,10 +109,12 @@ class ProductManager{
     }
 }
 
-const manager = new ProductManager('productos.json');
+module.exports = ProductManager;
+
+
+/*const manager = new ProductManager('productos.json');
 manager.addProduct('titulo','titulo prueba',50,'sin imagen','abc123',25);
-console.log(manager.getProductById(1));
 manager.addProduct('titulo','titulo prueba',50,'sin imagen','def123',25);
 console.log(manager.getProducts());
 manager.updateProduct(1,{title:'cambio de titulo'});
-manager.deleteProduct(2);
+manager.deleteProduct(2); */
