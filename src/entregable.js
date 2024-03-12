@@ -2,7 +2,6 @@ const fs = require('fs').promises;
 
 
 class ProductManager{
-    static #ultimoId = 1;
     #path
 
     constructor(path){
@@ -17,7 +16,6 @@ class ProductManager{
             if(limit!==undefined){
                 products=products.slice(0,limit);
             }
-
             return products;
         }catch(error){
             console.error("Error al leer el archivo: ",error);
@@ -25,18 +23,23 @@ class ProductManager{
         }
     }
 
-    #getNuevoId(){
-        const id = ProductManager.#ultimoId;
-        ProductManager.#ultimoId++;
-        return id
+    async #getNuevoId(){
+        let nuevoId = 1;
+        try{
+            const products = await this.getProducts();
+            if (products.length>0){
+                const maxId = Math.max(...products.map(product => product.id));
+                nuevoId=maxId+1;
+            }
+        }catch(error){
+            console.error('Error al obtener productos: ', error)
+        }
+        return nuevoId
     }
 
-    async addProduct(title,description,price,thumbnail,code,stock){
+    async addProduct(product){
 
-        if (!title || !description || !price || !thumbnail || !code || !stock) {
-            console.error("Todos los campos son obligatorios");
-            return
-        }
+        const { title, description, price, code, stock, category, thumbnail } = product;
 
         const products = await this.getProducts();
         const existingCode = products.some(prod => prod.code === code);
@@ -45,21 +48,23 @@ class ProductManager{
             return
         }
 
-        const product={
-            id: this.#getNuevoId(),
+        const newProduct={
+            id: await this.#getNuevoId(),
             title,
             description,
             price,
-            thumbnail,
             code,
             stock,
+            category,
+            thumbnail,
+            status: true,
         }
 
-        products.push(product);
-        await this.saveProductsToFile();
+        products.push(newProduct);
+        await this.saveProductsToFile(products);
     }
 
-    async saveProductsToFile(){
+    async saveProductsToFile(products){
         const productsJSON = JSON.stringify(products);
 
         await fs.writeFile(this.#path,productsJSON,'utf-8')

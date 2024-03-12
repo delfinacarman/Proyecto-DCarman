@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Carman</title>
+</head>
+<body>
+    <h2>Ingresa tu producto:</h2>
+    <form method="post" action="/api/products">
+        <label>Titulo:</label>
+        <input type="text" name="title" required/>
+
+        <label>Descripción:</label>
+        <input type="text" name="description" required/>
+
+        <label>Precio:</label>
+        <input type="number" name="price" required/>
+
+        <label>Código:</label>
+        <input type="text" name="code" required/>
+
+        <label>Stock:</label>
+        <input type="number" name="stock" required/>
+
+        <label>Categoría:</label>
+        <input type="text" name="category" required/>
+
+        <label>Thumbnails:</label>
+        <input type="text" name="thumbnail"/>
+
+        <button type="submit">Enviar</button>
+
+
+    </form>
+    <h2>Modificar un producto:</h2>
+    <form method="put" action="/api/products/:pid">
+
+        <label>Titulo:</label>
+        <input type="text" name="title"/>
+
+        <label>Descripción:</label>
+        <input type="text" name="description"/>
+
+        <label>Precio:</label>
+        <input type="number" name="price"/>
+
+        <label>Código:</label>
+        <input type="text" name="code"/>
+
+        <label>Stock:</label>
+        <input type="number" name="stock"/>
+
+        <label>Categoría:</label>
+        <input type="text" name="category"/>
+
+        <label>Thumbnails:</label>
+        <input type="text" name="thumbnail"/>
+
+        <button type="submit">Actualizar producto</button>
+
+
+    </form>
+</body>
+</html>
