@@ -63,12 +63,13 @@ router.put('/:pid',async(req,res)=>{
 
 router.delete('/:pid',async(req,res)=>{
     try{
-        const producto = await productManager.deleteProductProduct(parseInt(req.params.pid));
+        const producto = await productManager.getProductById(parseInt(req.params.pid));
+        const productoelim = await productManager.deleteProduct(parseInt(req.params.pid));
         if(!producto){
             res.end('Producto inexistente ')
             return
         }else{
-            res.json(producto);
+            res.end('Producto eliminado con exito!');
             return
         }
     }

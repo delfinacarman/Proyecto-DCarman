@@ -11,7 +11,7 @@ class ProductManager{
     async getProducts(limit){
         try{
             const fileContent = await fs.readFile(this.#path, 'utf-8');
-            const products = JSON.parse(fileContent);
+            let products = JSON.parse(fileContent);
 
             if(limit!==undefined){
                 products=products.slice(0,limit);
