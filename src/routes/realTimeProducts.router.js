@@ -5,7 +5,6 @@ const ProductManager = require('../entregable');
 const productManager = new ProductManager('./src/productos.json');
 
 
-
 router.get('/', async (_, res) => {
     try {
         const products = await productManager.getProducts();
