@@ -1,8 +1,8 @@
 const { Router } = require("express");
-const CartManager = require("../carrito.js");
+const CartManager = require("../dao/dbManager/cartManager.js");
 const cartManager = new CartManager("./src/carrito.json");
-const ProductManager = require ("../entregable.js");
-const productManager = new ProductManager("./src/productos.json")
+const ProductManager = require ("../dao/dbManager/productManager.js");
+//const productManager = new ProductManager("./src/productos.json")
 
 const router = Router();
 

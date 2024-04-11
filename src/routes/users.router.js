@@ -1,5 +1,5 @@
-const {Router} = require('express');
-const {User} = require('../models')
+/* const {Router} = require('express');
+const {User} = require('../dao/models')
 
 const router = Router();
 
@@ -27,4 +27,4 @@ router.post('/', async(req,res)=>{
 
 
 
-module.exports = router;
+module.exports = router; */
